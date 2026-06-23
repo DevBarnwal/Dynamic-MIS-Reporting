@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: student-mis-postgres
+    environment:
+      POSTGRES_DB: student_mis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
