@@ -3,6 +3,7 @@ package com.example.mis.controller;
 import com.example.mis.dto.ReportDefinition;
 import com.example.mis.dto.ReportFilterRequest;
 import com.example.mis.dto.ReportResult;
+import com.example.mis.service.AuthService;
 import com.example.mis.service.ReportExportService;
 import com.example.mis.service.ReportService;
 import java.util.List;
@@ -23,43 +24,52 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportController {
     private final ReportService reportService;
     private final ReportExportService exportService;
+    private final AuthService authService;
 
-    public ReportController(ReportService reportService, ReportExportService exportService) {
+    public ReportController(ReportService reportService, ReportExportService exportService, AuthService authService) {
         this.reportService = reportService;
         this.exportService = exportService;
+        this.authService = authService;
     }
 
     @GetMapping
-    public List<ReportDefinition> listReports() {
-        return reportService.listReports();
+    public List<ReportDefinition> listReports(@org.springframework.web.bind.annotation.RequestHeader("Authorization") String authorization) {
+        return reportService.listReports(authService.requireUser(authorization));
     }
 
     @GetMapping("/{reportId}")
-    public ReportDefinition getReport(@PathVariable long reportId) {
-        return reportService.getReportDefinition(reportId);
+    public ReportDefinition getReport(@PathVariable long reportId, @org.springframework.web.bind.annotation.RequestHeader("Authorization") String authorization) {
+        return reportService.getReportDefinition(reportId, authService.requireUser(authorization));
     }
 
     @GetMapping("/{reportId}/options/{filterName}")
     public List<Map<String, Object>> getDropdownOptions(
             @PathVariable long reportId,
-            @PathVariable String filterName
+            @PathVariable String filterName,
+            @org.springframework.web.bind.annotation.RequestHeader("Authorization") String authorization
     ) {
-        return reportService.getDropdownOptions(reportId, filterName);
+        return reportService.getDropdownOptions(reportId, filterName, authService.requireUser(authorization));
     }
 
     @PostMapping("/{reportId}/run")
-    public ReportResult runReport(@PathVariable long reportId, @RequestBody ReportFilterRequest request) {
-        return reportService.runReport(reportId, request.safeFilters());
+    public ReportResult runReport(
+            @PathVariable long reportId,
+            @RequestBody ReportFilterRequest request,
+            @org.springframework.web.bind.annotation.RequestHeader("Authorization") String authorization
+    ) {
+        return reportService.runReport(reportId, request.safeFilters(), authService.requireUser(authorization));
     }
 
     @PostMapping("/{reportId}/export/{format}")
     public ResponseEntity<byte[]> exportReport(
             @PathVariable long reportId,
             @PathVariable String format,
-            @RequestBody ReportFilterRequest request
+            @RequestBody ReportFilterRequest request,
+            @org.springframework.web.bind.annotation.RequestHeader("Authorization") String authorization
     ) {
-        ReportResult result = reportService.runReport(reportId, request.safeFilters());
-        ReportExportService.ExportFile file = exportService.export(result, format);
+        var user = authService.requireUser(authorization);
+        ReportResult result = reportService.runReport(reportId, request.safeFilters(), user);
+        ReportExportService.ExportFile file = exportService.export(result, format, user);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(file.contentType()))

@@ -37,12 +37,82 @@ button:disabled {
   padding: 24px;
 }
 
+.login-shell {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.login-panel {
+  width: min(460px, 100%);
+  border: 1px solid #d3dee8;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 28px;
+  box-shadow: 0 18px 38px rgba(16, 34, 58, 0.12);
+}
+
+.login-panel h1 {
+  margin-bottom: 24px;
+  font-size: 3rem;
+}
+
+.login-panel form {
+  display: grid;
+  gap: 14px;
+}
+
+.demo-users {
+  display: grid;
+  gap: 4px;
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 6px;
+  background: #eef6fb;
+  color: #36516b;
+  font-size: 0.86rem;
+}
+
 .topbar {
   display: flex;
   align-items: end;
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 18px;
+}
+
+.user-strip {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  max-width: 420px;
+  border: 1px solid #b7ccdc;
+  border-radius: 6px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: #243c56;
+  font-size: 0.9rem;
+}
+
+.role-pill span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-pill strong {
+  color: #0068b5;
+  font-size: 0.78rem;
 }
 
 .eyebrow {
@@ -128,6 +198,16 @@ h2 {
   display: grid;
   gap: 14px;
   margin: 16px 0 18px;
+}
+
+.scope-note {
+  margin: 14px 0 0;
+  border-left: 3px solid #0068b5;
+  padding: 10px 12px;
+  background: #f0f7fc;
+  color: #38546d;
+  font-size: 0.88rem;
+  line-height: 1.35;
 }
 
 .field {
@@ -256,7 +336,185 @@ tbody tr:nth-child(even) {
     width: 100%;
   }
 
+  .user-strip {
+    justify-content: stretch;
+  }
+
+  .role-pill {
+    width: 100%;
+    max-width: none;
+  }
+
   .table-frame {
     max-height: none;
   }
 }
+
+/* Row Action Buttons styling */
+.row-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid;
+  background: #ffffff;
+  transition: all 0.2s ease-in-out;
+  padding: 0;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 34, 58, 0.1);
+}
+
+.action-btn.edit-btn {
+  color: #0068b5;
+  border-color: #bfd4e6;
+}
+
+.action-btn.edit-btn:hover {
+  background: #0068b5;
+  color: #ffffff;
+  border-color: #0068b5;
+}
+
+.action-btn.delete-btn {
+  color: #b33925;
+  border-color: #f0cfcb;
+}
+
+.action-btn.delete-btn:hover {
+  background: #b33925;
+  color: #ffffff;
+  border-color: #b33925;
+}
+
+/* Add Student Button in Toolbar */
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-student-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  background: #0068b5;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  border: 0;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.add-student-btn:hover {
+  background: #005696;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 104, 181, 0.25);
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(16, 34, 58, 0.45);
+  backdrop-filter: blur(5px);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.modal-content {
+  background: #ffffff;
+  width: min(520px, 95vw);
+  border-radius: 8px;
+  border: 1px solid #d3dee8;
+  box-shadow: 0 24px 54px rgba(16, 34, 58, 0.18);
+  padding: 24px;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eef3f7;
+  padding-bottom: 12px;
+}
+
+.modal-header h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #10223a;
+  margin: 0;
+}
+
+.modal-form {
+  display: grid;
+  gap: 16px;
+}
+
+.modal-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  border-top: 1px solid #eef3f7;
+  padding-top: 16px;
+}
+
+.secondary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  background: #f8fbfd;
+  color: #244867;
+  font-weight: 700;
+  border: 1px solid #bfd0df;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.secondary-action:hover {
+  background: #eef5fa;
+}
+
+.field select:disabled {
+  background: #f2f5f8;
+  color: #5d6e80;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+

@@ -1,6 +1,7 @@
 package com.example.mis.service;
 
 import com.example.mis.dto.ReportResult;
+import com.example.mis.dto.CurrentUser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.lowagie.text.Document;
 import com.lowagie.text.PageSize;
@@ -28,7 +29,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ReportExportService {
-    public ExportFile export(ReportResult result, String format) {
+    private final AuditService auditService;
+
+    public ReportExportService(AuditService auditService) {
+        this.auditService = auditService;
+    }
+
+    public ExportFile export(ReportResult result, String format, CurrentUser user) {
+        if (!user.canExport()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Export is not allowed for this role");
+        }
+        auditService.log(user, "EXPORT_" + format.toUpperCase(), result.reportId(), result.totalRows() + " rows");
         return switch (format.toLowerCase()) {
             case "xlsx" -> new ExportFile(
                     filename(result, "xlsx"),

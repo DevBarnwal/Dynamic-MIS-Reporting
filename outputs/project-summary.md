@@ -2,6 +2,14 @@
 
 Created a full-stack dynamic MIS reporting starter with Spring Boot APIs, ReactJS frontend, and PostgreSQL schema/seed data.
 
+Added role-based access:
+
+- Admin, HOD, Faculty, Student, and Report Viewer demo users.
+- Bearer-token login sessions stored in PostgreSQL.
+- Automatic report scoping by department, course, or student.
+- Audit logging for report run/export actions.
+- Admin-only Audit Log report.
+
 Key paths:
 
 - `backend/` contains Spring Boot controllers, services, export logic, and Flyway SQL migration.
