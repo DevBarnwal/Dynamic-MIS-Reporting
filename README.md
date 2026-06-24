@@ -1,26 +1,42 @@
 # Student MIS Dynamic Reporting System
 
-This project is a full-stack MIS reporting starter built with:
+This project is a full-stack MIS reporting service built with:
 
 - Spring Boot APIs
 - ReactJS frontend
 - PostgreSQL database
 - Dynamic report configuration stored in `dynamic_report`
+- Role-Based Access Control (RBAC)
+- Audit Logging
 - Export support for PDF, JPG, and XLSX
 
 ## Features
 
-- Dynamic filter rendering from database metadata
-- Dynamic output table rendering from database metadata
-- Login with role-based report access
-- Admin, HOD, Faculty, Student, and Report Viewer demo roles
-- Automatic department/course/student scoping on report results
-- Audit log report for Admin users
-- Student MIS report
-- Department summary report
-- Result report
-- Dropdown options loaded from backend queries
-- Report export endpoints for `pdf`, `jpg`, and `xlsx`
+- **Authentication & Login**: JWT-style secure header token session storage (`user_session` table).
+- **Role-Based Access Control (RBAC)**: Enforces access limits on reports and operations based on user roles:
+  - **ADMIN**: Access to all reports (including Audit Log), Add/Remove/Edit students.
+  - **HOD (Head of Department)**: Access to reports, with filtering locked to their department; can Edit department students.
+  - **FACULTY**: Access to reports, with filtering locked to their course; can Edit course students.
+  - **STUDENT**: Access to reports, with filtering locked to their own record.
+  - **REPORT_VIEWER**: Read-only access to reports and exports.
+- **Student CRUD Management**: Interactive visual form to add, edit, and delete student records:
+  - Smart lockups enforce HOD and Faculty scope bounds in forms automatically.
+- **Audit Logging**: Logs all report run, export, and student edit/create/delete events in the `audit_log` table.
+- **Dynamic filter rendering** from database metadata.
+- **Dynamic output table rendering** from database metadata.
+- **Export support** for `pdf`, `jpg`, and `xlsx`.
+
+## Demo Users
+
+The database is pre-seeded with these demo credentials (password is username + `123`):
+
+| Username | Password | Role | Scopes |
+|---|---|---|---|
+| `admin` | `admin123` | Administrator | Full access, Audit logs, Add/Remove/Edit students |
+| `hod` | `hod123` | HOD | Computer Science department only, Edit CS students |
+| `faculty` | `faculty123` | Faculty | DBMS course only, Edit DBMS students |
+| `student` | `student123` | Student | Scoped to own record (Rahul Singh) |
+| `viewer` | `viewer123` | Report Viewer | Read-only reports & exports |
 
 ## Project Structure
 
@@ -28,8 +44,18 @@ This project is a full-stack MIS reporting starter built with:
 backend/
   pom.xml
   src/main/java/com/example/mis/
+    controller/
+      AuthController.java
+      ReportController.java
+      StudentController.java
+    service/
+      AuthService.java
+      AuditService.java
+      ReportExportService.java
+      ReportService.java
+      StudentService.java
   src/main/resources/application.yml
-  src/main/resources/db/migration/V1__init_student_mis.sql
+  src/main/resources/db/migration/
 
 frontend/
   package.json
@@ -45,15 +71,17 @@ docker-compose.yml
 - Java 21
 - Maven 3.9+
 - Node.js 20+
-- Docker Desktop, or a local PostgreSQL installation
+- Docker Desktop or a local PostgreSQL installation
 
 ## Run PostgreSQL
+
+Start the database container:
 
 ```bash
 docker compose up -d
 ```
 
-The database is created as:
+The database settings:
 
 ```text
 database: student_mis
@@ -62,7 +90,7 @@ password: postgres
 port: 5432
 ```
 
-Flyway creates and seeds the tables when the backend starts.
+Flyway automatically seeds the tables and demo data on backend startup.
 
 ## Run Backend
 
@@ -71,28 +99,26 @@ cd backend
 mvn spring-boot:run
 ```
 
-Backend URL:
+Backend URL: `http://localhost:8080`
+
+Main Endpoints:
 
 ```text
-http://localhost:8080
-```
+POST /api/auth/login
+GET  /api/auth/me
+POST /api/auth/logout
 
-Main endpoints:
-
-```text
 GET  /api/reports
 GET  /api/reports/{reportId}
 GET  /api/reports/{reportId}/options/{filterName}
 POST /api/reports/{reportId}/run
 POST /api/reports/{reportId}/export/{format}
-```
 
-Export formats:
-
-```text
-pdf
-jpg
-xlsx
+GET  /api/students/departments
+GET  /api/students/courses
+POST /api/students
+PUT  /api/students/{studentId}
+DELETE /api/students/{studentId}
 ```
 
 ## Run Frontend
@@ -103,28 +129,11 @@ npm install
 npm run dev
 ```
 
-Frontend URL:
-
-```text
-http://localhost:5173
-```
-
-## Demo Logins
-
-```text
-admin   / admin123    -> all reports, exports, audit log
-hod     / hod123      -> Computer Science department scope
-faculty / faculty123  -> DBMS course scope
-student / student123  -> Rahul Singh own-record scope
-viewer  / viewer123   -> read/export report viewer
-```
-
-After adding these changes to an existing database, restart the backend. Flyway will apply `V3__role_based_access.sql` automatically.
+Frontend URL: `http://localhost:5173` (or the port Vite outputs in your console)
 
 ## Suggested Improvements
 
 - Add a report-builder admin page for creating new report definitions.
 - Add pagination for large reports.
-- Add user-management screens for Admin.
 - Add chart output for department and result summaries.
 - Add safer SQL governance by restricting report queries to approved views.
